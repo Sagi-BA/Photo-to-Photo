@@ -36,7 +36,27 @@ def process_image(image_data):
     """עיבוד תמונה ל-BytesIO ולתיאור"""
     try:
         img_captioner = ImageCaptioning()
-        return img_captioner.process_bytesio_image(BytesIO(image_data.getvalue()), format=Image.open(BytesIO(image_data.getvalue())).format or 'PNG')
+        
+        # If image_data is already BytesIO, use it directly
+        if isinstance(image_data, BytesIO):
+            image_bytesio = image_data
+        else:
+            # Convert uploaded file to BytesIO
+            image_bytesio = BytesIO(image_data.getvalue())
+            
+        # Get the image format
+        img_format = Image.open(image_bytesio).format or 'PNG'
+        # Reset pointer position after reading format
+        image_bytesio.seek(0)
+        
+        # Process the image
+        result = img_captioner.process_bytesio_image(image_bytesio, format=img_format)
+        if result and len(result) == 2:
+            image, description = result
+            if description:
+                translated_desc = translate(description, 'iw')
+                return image, translated_desc
+        return None, None
     except Exception as e:
         st.error(f"שגיאה בעיבוד תמונה: {e}")
         return None, None
@@ -65,6 +85,14 @@ def load_sample_images():
                 continue
     return images
 
+def decode_base64_to_bytes(base64_string):
+    """Convert base64 string to bytes for processing"""
+    # Remove the data URL prefix if present
+    if ',' in base64_string:
+        base64_string = base64_string.split(',')[1]
+    return BytesIO(base64.b64decode(base64_string))
+
+
 def main():
     st.title("🎨 מחולל התמונות החכם")
     styles = load_styles()
@@ -77,14 +105,20 @@ def main():
         camera_photo = st.camera_input("צלם תמונה", disabled=not enable)
         
         if uploaded_file or camera_photo:
-            st.session_state.selected_image, st.session_state.image_description = process_image(uploaded_file or camera_photo)
-    
+            st.session_state.selected_image, st.session_state.image_description = process_image(uploaded_file or camera_photo)            
         with st.expander("תמונות לדוגמה"):
             sample_images = load_sample_images()
             for img in sample_images:
                 st.image(img, width=200)
                 if st.button("בחר תמונה", key=img):
-                    st.session_state.selected_image = img
+                    # Convert base64 image to BytesIO for processing
+                    img_bytes = decode_base64_to_bytes(img)
+                    st.session_state.selected_image, st.session_state.image_description = process_image(img_bytes)
+                    if st.session_state.selected_image is None:
+                        st.session_state.selected_image = img  # Fallback to original image if processing fails
+
+                    print(st.session_state.image_description)
+                    # st.session_state.selected_image = img
 
     with col2:
         if st.session_state.selected_image:

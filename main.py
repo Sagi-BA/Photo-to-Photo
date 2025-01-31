@@ -9,25 +9,67 @@ from utils.greenapi import WhatsAppSender
 from utils.Hugging_Face_Transformer import ImageCaptioning
 from deep_translator import GoogleTranslator
 
-# הגדרת עיצוב הדף
-st.set_page_config(page_title="מחולל התמונות החכם", page_icon="🎨", layout="wide")
+# Cache heavy models and resources
+@st.cache_resource
+def load_image_captioner():
+    """Load the image captioning model once and cache it"""
+    return ImageCaptioning()
 
-# CSS מותאם אישית
-st.markdown("""
-    <style>
-        .stButton>button { width: 100%; height: 3rem; font-size: 1.2rem; margin-top: 1rem; }
-        .st-emotion-cache-1v0mbdj > img { width: 100%; max-width: 300px; }
-        .upload-text { font-size: 1.2rem; text-align: center; margin: 1rem 0; }
-    </style>
-""", unsafe_allow_html=True)
+@st.cache_resource
+def load_translator():
+    """Initialize translator once"""
+    return GoogleTranslator(source='auto', target='en')
 
-# איתחול session state
-for key in ['generated_image', 'selected_image', 'image_description']:
-    st.session_state.setdefault(key, None if key != 'image_description' else "")
+@st.cache_resource
+def load_whatsapp_sender():
+    """Initialize WhatsApp sender once"""
+    return WhatsAppSender()
+
+@st.cache_resource
+def load_pollinations_generator():
+    """Initialize image generator once"""
+    return PollinationsGenerator()
+
+@st.cache_data
+def load_styles():
+    """טעינת סגנונות - cached for better performance"""
+    try:
+        with open('data/image_styles.json', 'r', encoding='utf-8') as f:
+            styles = json.load(f).get('styles', [])
+            # מיון הסגנונות לשתי קבוצות - סגנון חופשי ושאר הסגנונות
+            free_style = [style for style in styles if style['name'] == "סגנון חופשי"]
+            other_styles = [style for style in styles if style['name'] != "סגנון חופשי"]
+            # מיון שאר הסגנונות לפי סדר אלפביתי
+            sorted_other_styles = sorted(other_styles, key=lambda x: x['name'])
+            # חיבור הרשימות - קודם סגנון חופשי ואחר כך שאר הסגנונות הממוינים
+            return free_style + sorted_other_styles
+    except Exception as e:
+        st.error(f"שגיאה בטעינת הסגנונות: {e}")
+        return []
+
+@st.cache_data
+def load_sample_images():
+    """טעינת תמונות לדוגמה - cached for better performance"""
+    examples_dir = "examples"
+    images = []
+    if os.path.exists(examples_dir):
+        for filename in os.listdir(examples_dir):
+            file_path = os.path.join(examples_dir, filename)
+            try:
+                with open(file_path, "rb") as img_file:
+                    image_uri = f"data:image/{filename.split('.')[-1]};base64,{base64.b64encode(img_file.read()).decode()}"
+                images.append(image_uri)
+            except Exception:
+                continue
+    return images
 
 def translate(text, target='en'):
+    """Translation using cached translator"""
+    if not text:
+        return ""
     try:
-        return GoogleTranslator(source='auto', target=target).translate(text)
+        translator = load_translator() if target == 'en' else GoogleTranslator(source='auto', target=target)
+        return translator.translate(text)
     except Exception as e:
         st.error(f"שגיאה בתרגום: {e}")
         return text
@@ -35,7 +77,7 @@ def translate(text, target='en'):
 def process_image(image_data):
     """עיבוד תמונה ל-BytesIO ולתיאור"""
     try:
-        img_captioner = ImageCaptioning()
+        img_captioner = load_image_captioner()
         
         # If image_data is already BytesIO, use it directly
         if isinstance(image_data, BytesIO):
@@ -61,30 +103,6 @@ def process_image(image_data):
         st.error(f"שגיאה בעיבוד תמונה: {e}")
         return None, None
 
-def load_styles():
-    """טעינת סגנונות"""
-    try:
-        with open('data/image_styles.json', 'r', encoding='utf-8') as f:
-            return sorted(json.load(f).get('styles', []), key=lambda x: x.get('popularity_rank', 999))
-    except Exception as e:
-        st.error(f"שגיאה בטעינת הסגנונות: {e}")
-        return []
-
-def load_sample_images():
-    """טעינת תמונות לדוגמה"""
-    examples_dir = "examples"
-    images = []
-    if os.path.exists(examples_dir):
-        for filename in os.listdir(examples_dir):
-            file_path = os.path.join(examples_dir, filename)
-            try:
-                with open(file_path, "rb") as img_file:
-                    image_uri = f"data:image/{filename.split('.')[-1]};base64,{base64.b64encode(img_file.read()).decode()}"
-                images.append(image_uri)
-            except Exception:
-                continue
-    return images
-
 def decode_base64_to_bytes(base64_string):
     """Convert base64 string to bytes for processing"""
     # Remove the data URL prefix if present
@@ -92,6 +110,21 @@ def decode_base64_to_bytes(base64_string):
         base64_string = base64_string.split(',')[1]
     return BytesIO(base64.b64decode(base64_string))
 
+# הגדרת עיצוב הדף
+st.set_page_config(page_title="מחולל התמונות החכם", page_icon="🎨", layout="wide")
+
+# CSS מותאם אישית
+st.markdown("""
+    <style>
+        .stButton>button { width: 100%; height: 3rem; font-size: 1.2rem; margin-top: 1rem; }
+        .st-emotion-cache-1v0mbdj > img { width: 100%; max-width: 300px; }
+        .upload-text { font-size: 1.2rem; text-align: center; margin: 1rem 0; }
+    </style>
+""", unsafe_allow_html=True)
+
+# איתחול session state
+for key in ['generated_image', 'selected_image', 'image_description']:
+    st.session_state.setdefault(key, None if key != 'image_description' else "")
 
 def main():
     st.title("🎨 מחולל התמונות החכם")
@@ -106,19 +139,16 @@ def main():
         
         if uploaded_file or camera_photo:
             st.session_state.selected_image, st.session_state.image_description = process_image(uploaded_file or camera_photo)            
+        
         with st.expander("תמונות לדוגמה"):
             sample_images = load_sample_images()
             for img in sample_images:
                 st.image(img, width=200)
                 if st.button("בחר תמונה", key=img):
-                    # Convert base64 image to BytesIO for processing
                     img_bytes = decode_base64_to_bytes(img)
                     st.session_state.selected_image, st.session_state.image_description = process_image(img_bytes)
                     if st.session_state.selected_image is None:
-                        st.session_state.selected_image = img  # Fallback to original image if processing fails
-
-                    print(st.session_state.image_description)
-                    # st.session_state.selected_image = img
+                        st.session_state.selected_image = img
 
     with col2:
         if st.session_state.selected_image:
@@ -132,7 +162,7 @@ def main():
             if st.button("🎨 צור תמונה חדשה", type="primary") and prompt:
                 with st.spinner('מייצר תמונה...'):
                     full_prompt = f"{next(s['prompt_prefix'] for s in styles if s['name'] == style)} {translate(prompt, 'en')}"
-                    generator = PollinationsGenerator()
+                    generator = load_pollinations_generator()
                     st.session_state.generated_image = generator.generate_image(full_prompt, "turbo")
                     if st.session_state.generated_image:
                         st.success('התמונה נוצרה בהצלחה!')
@@ -153,7 +183,7 @@ def main():
                 if phone and phone.isdigit() and len(phone) >= 9:
                     try:
                         img_data = base64.b64decode(st.session_state.generated_image.split(',')[1])
-                        whatsapp = WhatsAppSender()
+                        whatsapp = load_whatsapp_sender()
                         success = whatsapp.send_image_from_bytesio(
                             phone=phone,
                             image_bytesio=BytesIO(img_data),
@@ -168,6 +198,6 @@ def main():
                         st.error(f"שגיאה בשליחת התמונה: {e}")
                 else:
                     st.error("אנא הכנס מספר טלפון תקין")
-    
+
 if __name__ == "__main__":
     main()

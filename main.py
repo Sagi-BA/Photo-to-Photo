@@ -13,7 +13,8 @@ from deep_translator import GoogleTranslator
 @st.cache_resource
 def load_image_captioner():
     """Load the image captioning model once and cache it"""
-    return ImageCaptioning()
+    with st.spinner('טוען מודל זיהוי תמונות... (יכול לקחת כמה שניות בפעם הראשונה)'):
+        return ImageCaptioning()
 
 @st.cache_resource
 def load_translator():
@@ -77,28 +78,25 @@ def translate(text, target='en'):
 def process_image(image_data):
     """עיבוד תמונה ל-BytesIO ולתיאור"""
     try:
-        img_captioner = load_image_captioner()
-        
-        # If image_data is already BytesIO, use it directly
-        if isinstance(image_data, BytesIO):
-            image_bytesio = image_data
-        else:
-            # Convert uploaded file to BytesIO
-            image_bytesio = BytesIO(image_data.getvalue())
+        with st.spinner('מנתח את התמונה...'):
+            img_captioner = load_image_captioner()
             
-        # Get the image format
-        img_format = Image.open(image_bytesio).format or 'PNG'
-        # Reset pointer position after reading format
-        image_bytesio.seek(0)
-        
-        # Process the image
-        result = img_captioner.process_bytesio_image(image_bytesio, format=img_format)
-        if result and len(result) == 2:
-            image, description = result
-            if description:
-                translated_desc = translate(description, 'iw')
-                return image, translated_desc
-        return None, None
+            if isinstance(image_data, BytesIO):
+                image_bytesio = image_data
+            else:
+                image_bytesio = BytesIO(image_data.getvalue())
+            
+            img_format = Image.open(image_bytesio).format or 'PNG'
+            image_bytesio.seek(0)
+            
+            result = img_captioner.process_bytesio_image(image_bytesio, format=img_format)
+            if result and len(result) == 2:
+                image, description = result
+                if description:
+                    with st.spinner('מתרגם את התיאור...'):
+                        translated_desc = translate(description, 'iw')
+                        return image, translated_desc
+            return None, None
     except Exception as e:
         st.error(f"שגיאה בעיבוד תמונה: {e}")
         return None, None
@@ -127,8 +125,9 @@ for key in ['generated_image', 'selected_image', 'image_description']:
     st.session_state.setdefault(key, None if key != 'image_description' else "")
 
 def main():
-    st.title("🎨 מחולל התמונות החכם")
-    styles = load_styles()
+    with st.spinner('טוען את האפליקציה...'):
+        st.title("🎨 מחולל התמונות החכם")
+        styles = load_styles()
     
     col1, col2 = st.columns([2, 3])
     with col1:
@@ -141,7 +140,8 @@ def main():
             st.session_state.selected_image, st.session_state.image_description = process_image(uploaded_file or camera_photo)            
         
         with st.expander("תמונות לדוגמה"):
-            sample_images = load_sample_images()
+            with st.spinner('טוען תמונות לדוגמה...'):
+                sample_images = load_sample_images()
             for img in sample_images:
                 st.image(img, width=200)
                 if st.button("בחר תמונה", key=img):
@@ -156,12 +156,15 @@ def main():
             st.image(st.session_state.selected_image, use_container_width=True)
             
             st.subheader("✨ הגדרות עיבוד")
-            prompt = st.text_area("תיאור התמונה", translate(st.session_state.image_description, 'iw'), height=100)
+            with st.spinner('מכין את התיאור...'):
+                prompt = st.text_area("תיאור התמונה", translate(st.session_state.image_description, 'iw'), height=100)
             style = st.selectbox("בחר סגנון", [s['name'] for s in styles], index=0)
             
             if st.button("🎨 צור תמונה חדשה", type="primary") and prompt:
-                with st.spinner('מייצר תמונה...'):
+                with st.spinner('מתרגם את התיאור לאנגלית...'):
                     full_prompt = f"{next(s['prompt_prefix'] for s in styles if s['name'] == style)} {translate(prompt, 'en')}"
+                
+                with st.spinner('מייצר תמונה חדשה... (יכול לקחת עד 30 שניות)'):
                     generator = load_pollinations_generator()
                     st.session_state.generated_image = generator.generate_image(full_prompt, "turbo")
                     if st.session_state.generated_image:
@@ -182,18 +185,19 @@ def main():
             if st.button("📲 שלח בוואטסאפ"):
                 if phone and phone.isdigit() and len(phone) >= 9:
                     try:
-                        img_data = base64.b64decode(st.session_state.generated_image.split(',')[1])
-                        whatsapp = load_whatsapp_sender()
-                        success = whatsapp.send_image_from_bytesio(
-                            phone=phone,
-                            image_bytesio=BytesIO(img_data),
-                            caption="תמונה שנוצרה באמצעות מחולל התמונות החכם"
-                        )
-                        
-                        if success:
-                            st.success(f"התמונה נשלחה בהצלחה למספר {phone}")
-                        else:
-                            st.error("שגיאה בשליחת התמונה")
+                        with st.spinner('שולח את התמונה בוואטסאפ...'):
+                            img_data = base64.b64decode(st.session_state.generated_image.split(',')[1])
+                            whatsapp = load_whatsapp_sender()
+                            success = whatsapp.send_image_from_bytesio(
+                                phone=phone,
+                                image_bytesio=BytesIO(img_data),
+                                caption="תמונה שנוצרה באמצעות מחולל התמונות החכם"
+                            )
+                            
+                            if success:
+                                st.success(f"התמונה נשלחה בהצלחה למספר {phone}")
+                            else:
+                                st.error("שגיאה בשליחת התמונה")
                     except Exception as e:
                         st.error(f"שגיאה בשליחת התמונה: {e}")
                 else:

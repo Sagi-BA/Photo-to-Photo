@@ -1,60 +1,59 @@
+import torch
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import requests
 from io import BytesIO
 import base64
-import os
 
 class ImageCaptioning:
-    def __init__(self, model_name="Salesforce/blip-image-captioning-large"):
+    def __init__(self, model_name="Salesforce/blip-image-captioning-base"):
         """
         Initializes the ImageCaptioning class by loading the processor and model.
-        :param model_name: The name of the pre-trained BLIP model.
+        Using base model instead of large for better performance.
         """
+        torch.backends.cuda.matmul.allow_tf32 = True  # בשביל ביצועים טובים יותר
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.processor = BlipProcessor.from_pretrained(model_name)
-        self.model = BlipForConditionalGeneration.from_pretrained(model_name)
+        self.model = BlipForConditionalGeneration.from_pretrained(
+            model_name,
+            torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
+        ).to(self.device)
 
     def describe_image(self, image_url):
         """
         Generates a textual description for the given image URL.
-        :param image_url: The URL of the image to be described.
-        :return: The generated caption as a string.
         """
         try:
-            image = Image.open(requests.get(image_url, stream=True).raw).convert("RGB")
-            inputs = self.processor(images=image, return_tensors="pt")
-            caption_ids = self.model.generate(**inputs)
-            caption = self.processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
+            image = Image.open(requests.get(image_url, stream=True).raw).convert('RGB')
+            inputs = self.processor(images=image, return_tensors="pt").to(self.device)
+            
+            with torch.no_grad():
+                output = self.model.generate(**inputs, max_length=100)
+            
+            caption = self.processor.decode(output[0], skip_special_tokens=True)
             return caption
+            
         except Exception as e:
-            return f"Error processing image: {e}"
+            print(f"Error processing image: {e}")
+            return "Could not generate description"
 
     def process_bytesio_image(self, image_bytes: BytesIO, format: str = "PNG") -> tuple[str, str]:
         """
         Process an image from BytesIO and return its data URI and description.
-        
-        Args:
-            image_bytes (BytesIO): The image in BytesIO format
-            format (str): The image format (default: "PNG")
-        
-        Returns:
-            tuple[str, str]: (image_uri, description)
         """
         try:
             # Reset BytesIO position
             image_bytes.seek(0)
             
-            # Open image with PIL
-            img = Image.open(image_bytes)
-            
-            # Convert to RGB if necessary
-            if img.mode != "RGB":
-                img = img.convert("RGB")
+            # Open and convert image
+            img = Image.open(image_bytes).convert('RGB')
                 
             # Generate description using BLIP model
-            inputs = self.processor(images=img, return_tensors="pt")
-            caption_ids = self.model.generate(**inputs)
-            description = self.processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
+            inputs = self.processor(images=img, return_tensors="pt").to(self.device)
+            
+            with torch.no_grad():
+                output = self.model.generate(**inputs, max_length=100)
+            description = self.processor.decode(output[0], skip_special_tokens=True)
             
             # Save to a new BytesIO for the URI
             output_bytes = BytesIO()
@@ -71,23 +70,11 @@ class ImageCaptioning:
             print(f"Error processing image: {str(e)}")
             return None, None
 
-# Example usage
+# Test functionality
 if __name__ == "__main__":
     captioner = ImageCaptioning()
-    
-    # Test URL-based description
-    image_url = "https://t4.ftcdn.net/jpg/05/01/84/43/360_F_501844341_cA5xxjYPd4hL19XMImLMj5sCnP1Ib4hI.jpg"
+    # Test with a sample image
+    image_url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+    print("Testing image description...")
     description = captioner.describe_image(image_url)
-    print("URL Image Description:", description)
-    
-    # Test BytesIO-based description
-    try:
-        # Create a test BytesIO image
-        response = requests.get(image_url)
-        image_bytes = BytesIO(response.content)
-        
-        image_uri, description = captioner.process_bytesio_image(image_bytes)
-        print("\nBytesIO Image Description:", description)
-        print("Image URI generated successfully:", bool(image_uri))
-    except Exception as e:
-        print(f"Error in BytesIO test: {e}")
+    print(f"Description: {description}")

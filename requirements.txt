@@ -22,7 +22,6 @@ typing-extensions
 urllib3
 
 together
-together-ai
 
 # for GOOGLE CLOUD VISION
 # google-cloud-vision

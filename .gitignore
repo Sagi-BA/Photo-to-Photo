@@ -1,0 +1,7 @@
+*.code-workspace
+.env
+temp
+uploads
+# Ignore all __pycache__ directories
+**/__pycache__/
+myenv

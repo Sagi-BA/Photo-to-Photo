@@ -1,0 +1,114 @@
+{
+  "styles": [
+    {
+      "name": "אבסטרקטי",
+      "prompt_prefix": "abstract artwork representing",
+      "popularity_rank": 15
+    },
+    {
+      "name": "אימפרסיוניסטי",
+      "prompt_prefix": "impressionist painting style of",
+      "popularity_rank": 16
+    },
+    {
+      "name": "אנימה",
+      "prompt_prefix": "anime style artwork of",
+      "popularity_rank": 3
+    },
+    {
+      "name": "גותי",
+      "prompt_prefix": "gothic style depiction of",
+      "popularity_rank": 20
+    },
+    {
+      "name": "דיגיטל ארט",
+      "prompt_prefix": "digital art of",
+      "popularity_rank": 5
+    },
+    {
+      "name": "דיסני",
+      "prompt_prefix": "Disney style illustration of",
+      "popularity_rank": 2
+    },
+    {
+      "name": "וופורוויב",
+      "prompt_prefix": "vaporwave aesthetic image of",
+      "popularity_rank": 19
+    },
+    {
+      "name": "מינימליסטי",
+      "prompt_prefix": "minimalist design of",
+      "popularity_rank": 12
+    },
+    {
+      "name": "מצויר",
+      "prompt_prefix": "hand drawn illustration of",
+      "popularity_rank": 7
+    },
+    {
+      "name": "סגנון חופשי",
+      "prompt_prefix": "",
+      "popularity_rank": 1
+    },
+    {
+      "name": "סוריאליסטי",
+      "prompt_prefix": "surrealist image depicting",
+      "popularity_rank": 14
+    },
+    {
+      "name": "סייברפאנק",
+      "prompt_prefix": "cyberpunk themed image of",
+      "popularity_rank": 13
+    },
+    {
+      "name": "סטימפאנק",
+      "prompt_prefix": "steampunk themed image of",
+      "popularity_rank": 18
+    },
+    {
+      "name": "סקיצה",
+      "prompt_prefix": "pencil sketch of",
+      "popularity_rank": 11
+    },
+    {
+      "name": "פוטוריאליסטי",
+      "prompt_prefix": "photorealistic image of",
+      "popularity_rank": 4
+    },
+    {
+      "name": "פיקסאר",
+      "prompt_prefix": "Pixar style 3D rendering of",
+      "popularity_rank": 6
+    },
+    {
+      "name": "פיקסל ארט",
+      "prompt_prefix": "pixel art of",
+      "popularity_rank": 17
+    },
+    {
+      "name": "פנטזיה",
+      "prompt_prefix": "fantasy artwork of",
+      "popularity_rank": 10
+    },
+    {
+      "name": "פופ ארט",
+      "prompt_prefix": "pop art style image of",
+      "popularity_rank": 9
+    },
+    {
+      "name": "צבעי מים",
+      "prompt_prefix": "watercolor painting of",
+      "popularity_rank": 8
+    },
+    {
+      "name": "קומיקס",
+      "prompt_prefix": "comic book style art of",
+      "popularity_rank": 21
+    },
+    {
+      "name": "רטרו",
+      "prompt_prefix": "retro style illustration of",
+      "popularity_rank": 22
+    }
+  ]
+}

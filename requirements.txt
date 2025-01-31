@@ -1,0 +1,42 @@
+## Create a new virtual environment:
+# python -m venv myenv
+
+## Activate the virtual environment:
+# myenv\Scripts\activate
+
+# pip install -r requirements.txt
+
+# Web Application
+streamlit 
+# Image Processing
+Pillow
+# API Requests
+requests
+# Environment Variables
+python-dotenv
+# Data Processing
+pandas
+# Type Hints
+typing-extensions
+# URL Processing
+urllib3
+
+together
+together-ai
+
+# for GOOGLE CLOUD VISION
+# google-cloud-vision
+torch
+torchvision
+transformers
+
+numpy
+
+# for GOOGLE CLOUD VISION
+deep_translator
+
+
+# aiohttp #This is for telegram
+
+
+

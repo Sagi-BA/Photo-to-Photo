@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "install-requests",
+			"command": "pip",
+			"args": [
+				"install",
+				"requests"
+			],
+			"presentation": {
+				"reveal": "silent"
+			}
+		}
+	]
+}

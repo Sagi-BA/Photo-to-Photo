@@ -1,4 +1,4 @@
-# pages/3_🎨_result.py
+# pages/3_result.py
 import streamlit as st
 import base64
 from io import BytesIO

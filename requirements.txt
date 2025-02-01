@@ -8,7 +8,8 @@
 
 # Web Application
 streamlit 
-streamlit-modal streamlit-extras
+streamlit-modal 
+streamlit-extras
 
 # Image Processing
 Pillow

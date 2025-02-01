@@ -3,7 +3,6 @@ import base64
 import streamlit as st
 import json
 import os
-from streamlit_modal import Modal
 from PIL import Image
 from io import BytesIO
 from utils.counter import increment_user_count, get_user_count

@@ -42,10 +42,10 @@ def main():
         return
 
     # Display selected image
-    body = "התמונה שנבחרה נשמרה בהצלחה, נמשיך לשלב הבא..."
-    st.toast(body, icon='🖼️')
+    # body = "התמונה שנבחרה נשמרה בהצלחה, נמשיך לשלב הבא..."
+    # st.toast(body, icon='🖼️')
 
-    st.subheader("התמונה שנבחרה 🖼️")
+    # st.subheader("התמונה שנבחרה 🖼️")
     st.image(st.session_state.selected_image, use_container_width=True)
 
     # Load styles

@@ -160,6 +160,78 @@ p {
   overflow: auto;
   background-color: rgba(0, 0, 0, 0.9);
 }
+
+/* Modern Image Container Styling */
+.stImage {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.stImage:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+/* Image Effect */
+.stImage img {
+    transition: all 0.5s ease-in-out;
+    backface-visibility: hidden;
+}
+
+.stImage:hover img {
+    transform: scale(1.02);
+}
+
+/* Glass Morphism Effect for Selected Image */
+[data-testid="column"]:nth-of-type(2) .stImage {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Sample Images Grid */
+[data-testid="column"]:nth-of-type(1) .stImage {
+    margin-bottom: 20px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+[data-testid="column"]:nth-of-type(1) .stImage:hover {
+    border-color: #6c5ce7;
+}
+
+/* Generated Image Special Effect */
+.element-container:has(img[src*="generated"]) .stImage {
+    animation: fadeIn 0.5s ease-out;
+    border: 3px solid #6c5ce7;
+    padding: 5px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .stImage {
+        margin: 10px 0;
+        border-radius: 10px;
+    }
+    
+    .stImage:hover {
+        transform: none;
+    }
+}
 @media screen and (max-width: 1125px) {
   .button {
     width: 225px;

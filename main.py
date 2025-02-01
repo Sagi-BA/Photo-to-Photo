@@ -236,6 +236,50 @@ def hide_streamlit_header_footer():
             }
             header {visibility: hidden;}
             #root > div:nth-child(1) > div > div > div > div > section > div {padding-top: 0rem;}
+            /* עיצוב כפתורי הרדיו */
+            div.row-widget.stRadio > div {
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+                padding: 1rem;
+                background: #f8f9fa;
+                border-radius: 10px;
+                margin-bottom: 2rem;
+            }
+            
+            div.row-widget.stRadio > div label {
+                padding: 0.5rem 1rem;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            div.row-widget.stRadio > div label:hover {
+                background: #e9ecef;
+            }
+            
+            /* עיצוב אזור העלאת קבצים */
+            .stFileUploader {
+                padding: 2rem;
+                border: 2px dashed #dee2e6;
+                border-radius: 10px;
+                text-align: center;
+            }
+            
+            /* עיצוב תמונות הדוגמה */
+            div.column-widget.stImage {
+                margin-bottom: 1rem;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            /* עיצוב כפתורי בחירת תמונה */
+            .stButton > button {
+                width: 100%;
+                margin-top: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
             </style>
             """
     st.markdown(hide_st_style, unsafe_allow_html=True)
@@ -267,49 +311,65 @@ async def main():
     col1, col2 = st.columns([2, 3])
     with col1:
         st.subheader("העלאת תמונה 📸")
-        uploaded_file = st.file_uploader("לעלות תמונה", type=["jpg", "jpeg", "png", "gif", "webp"])
-        enable = st.checkbox("להפעלת המצלמה יש לסמן")
-        camera_photo = st.camera_input("לצלם תמונה", disabled=not enable)
         
-        if uploaded_file or camera_photo:
-            st.session_state.selected_image, st.session_state.image_description = process_image(uploaded_file or camera_photo)            
+        # Create image source selector
+        image_source = st.radio(
+            "בחרו את מקור התמונה:",
+            options=["העלאת תמונה", "צילום מהמצלמה", "בחירה מתמונות לדוגמה"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
         
-        with st.expander("ניתן להשתמש בתמונות לדוגמה:"):
+        if image_source == "העלאת תמונה":
+            uploaded_file = st.file_uploader("גררו לכאן תמונה או לחצו לבחירה", type=["jpg", "jpeg", "png", "gif", "webp"])
+            if uploaded_file:
+                st.session_state.selected_image, st.session_state.image_description = process_image(uploaded_file)
+        
+        elif image_source == "צילום מהמצלמה":
+            camera_photo = st.camera_input("צלמו תמונה")
+            if camera_photo:
+                st.session_state.selected_image, st.session_state.image_description = process_image(camera_photo)
+        
+        else:  # בחירה מתמונות לדוגמה
             with st.spinner('אני טוען תמונות לדוגמה...'):
                 sample_images = load_sample_images()
-            for img in sample_images:
-                st.image(img, width=200)
-                if st.button("בחרו תמונה", key=img):
-                    img_bytes = decode_base64_to_bytes(img)
-                    st.session_state.selected_image, st.session_state.image_description = process_image(img_bytes)
-                    if st.session_state.selected_image is None:
-                        st.session_state.selected_image = img
-
-    with col2:
-        if st.session_state.selected_image:
-            st.subheader("התמונה שנבחרה 🖼️")
-            st.image(st.session_state.selected_image, use_container_width=True)
-            
-            # st.subheader("✨ הגדרות עיבוד")
-            with st.spinner('אני קורא את תוכן התמונה...'):
-                prompt = st.text_area("תיאור התמונה", translate(st.session_state.image_description, 'iw'), height=100)
-            style = st.selectbox("נא בחרו את סגנון התמונה החדשה שאתם רוצים שאייצר לכם...", [s['name'] for s in styles], index=0)
-            
-            if st.button("✨ לחצו עליי ותגלו את הקסם ✨", type="primary") and prompt:                
-                # Get the selected style data
-                selected_style = next(s for s in styles if s['name'] == style)
-                full_prompt = f"{selected_style['prompt_prefix']} {translate(prompt, 'en')}"
                 
-                with st.spinner('אני יוצר את הקסם... (זה יכול לקחת עד 10 שניות)'):
-                    generator = load_pollinations_generator()
-                    # Use the model specified in the style
-                    model = selected_style.get('model', 'turbo')  # Default to 'turbo' if no model specified
-                    print(f"Using model: {model}")
-                    st.session_state.generated_image = generator.generate_image(full_prompt, model)
-                    if st.session_state.generated_image:
-                        st.success('יצרתי לכם תמונה חדשה מה אתם אומרים?')
-                    else:
-                        st.error('אירעה שגיאה ביצירת התמונה.')
+                # Create a grid of sample images
+                cols = st.columns(2)
+                for idx, img in enumerate(sample_images):
+                    with cols[idx % 2]:
+                        st.image(img, use_container_width=True)
+                        if st.button("בחרו תמונה זו", key=f"sample_{idx}"):
+                            img_bytes = decode_base64_to_bytes(img)
+                            st.session_state.selected_image, st.session_state.image_description = process_image(img_bytes)
+                            if st.session_state.selected_image is None:
+                                st.session_state.selected_image = img
+
+
+    if st.session_state.selected_image:
+        st.subheader("התמונה שנבחרה 🖼️")
+        st.image(st.session_state.selected_image, use_container_width=True)
+        
+        # st.subheader("✨ הגדרות עיבוד")
+        with st.spinner('אני קורא את תוכן התמונה...'):
+            prompt = st.text_area("תיאור התמונה", translate(st.session_state.image_description, 'iw'), height=100)
+        style = st.selectbox("נא בחרו את סגנון התמונה החדשה שאתם רוצים שאייצר לכם...", [s['name'] for s in styles], index=0)
+        
+        if st.button("✨ לחצו עליי ותגלו את הקסם ✨", type="primary") and prompt:                
+            # Get the selected style data
+            selected_style = next(s for s in styles if s['name'] == style)
+            full_prompt = f"{selected_style['prompt_prefix']} {translate(prompt, 'en')}"
+            
+            with st.spinner('אני יוצר את הקסם... (זה יכול לקחת עד 10 שניות)'):
+                generator = load_pollinations_generator()
+                # Use the model specified in the style
+                model = selected_style.get('model', 'turbo')  # Default to 'turbo' if no model specified
+                print(f"Using model: {model}")
+                st.session_state.generated_image = generator.generate_image(full_prompt, model)
+                if st.session_state.generated_image:
+                    st.success('יצרתי לכם תמונה חדשה מה אתם אומרים?')
+                else:
+                    st.error('אירעה שגיאה ביצירת התמונה.')
     
     if st.session_state.generated_image:
         st.subheader("הקסם הושלם – הנה היצירה שלכם! 🎉")

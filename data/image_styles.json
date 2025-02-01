@@ -3,112 +3,134 @@
     {
       "name": "אבסטרקטי",
       "prompt_prefix": "abstract artwork representing",
-      "popularity_rank": 15
+      "popularity_rank": 15,
+      "model": "flux-realism"
     },
     {
       "name": "אימפרסיוניסטי",
       "prompt_prefix": "impressionist painting style of",
-      "popularity_rank": 16
+      "popularity_rank": 16,
+      "model": "flux-realism"
     },
     {
       "name": "אנימה",
       "prompt_prefix": "anime style artwork of",
-      "popularity_rank": 3
+      "popularity_rank": 3,
+      "model": "flux-anime"
     },
     {
       "name": "גותי",
       "prompt_prefix": "gothic style depiction of",
-      "popularity_rank": 20
+      "popularity_rank": 20,
+      "model": "flux-realism"
     },
     {
       "name": "דיגיטל ארט",
       "prompt_prefix": "digital art of",
-      "popularity_rank": 5
+      "popularity_rank": 5,
+      "model": "flux-pro"
     },
     {
       "name": "דיסני",
       "prompt_prefix": "Disney style illustration of",
-      "popularity_rank": 2
+      "popularity_rank": 2,
+      "model": "flux-3d"
     },
     {
       "name": "וופורוויב",
       "prompt_prefix": "vaporwave aesthetic image of",
-      "popularity_rank": 19
+      "popularity_rank": 19,
+      "model": "flux"
     },
     {
       "name": "מינימליסטי",
       "prompt_prefix": "minimalist design of",
-      "popularity_rank": 12
+      "popularity_rank": 12,
+      "model": "flux"
     },
     {
       "name": "מצויר",
       "prompt_prefix": "hand drawn illustration of",
-      "popularity_rank": 7
+      "popularity_rank": 7,
+      "model": "flux-pro"
     },
     {
       "name": "סגנון חופשי",
       "prompt_prefix": "",
-      "popularity_rank": 1
+      "popularity_rank": 1,
+      "model": "turbo"
     },
     {
       "name": "סוריאליסטי",
       "prompt_prefix": "surrealist image depicting",
-      "popularity_rank": 14
+      "popularity_rank": 14,
+      "model": "flux-realism"
     },
     {
       "name": "סייברפאנק",
       "prompt_prefix": "cyberpunk themed image of",
-      "popularity_rank": 13
+      "popularity_rank": 13,
+      "model": "flux-pro"
     },
     {
       "name": "סטימפאנק",
       "prompt_prefix": "steampunk themed image of",
-      "popularity_rank": 18
+      "popularity_rank": 18,
+      "model": "flux-pro"
     },
     {
       "name": "סקיצה",
       "prompt_prefix": "pencil sketch of",
-      "popularity_rank": 11
+      "popularity_rank": 11,
+      "model": "flux"
     },
     {
       "name": "פוטוריאליסטי",
       "prompt_prefix": "photorealistic image of",
-      "popularity_rank": 4
+      "popularity_rank": 4,
+      "model": "flux-realism"
     },
     {
       "name": "פיקסאר",
       "prompt_prefix": "Pixar style 3D rendering of",
-      "popularity_rank": 6
+      "popularity_rank": 6,
+      "model": "flux-3d"
     },
     {
       "name": "פיקסל ארט",
       "prompt_prefix": "pixel art of",
-      "popularity_rank": 17
+      "popularity_rank": 17,
+      "model": "flux"
     },
     {
       "name": "פנטזיה",
       "prompt_prefix": "fantasy artwork of",
-      "popularity_rank": 10
+      "popularity_rank": 10,
+      "model": "flux-realism"
     },
     {
       "name": "פופ ארט",
       "prompt_prefix": "pop art style image of",
-      "popularity_rank": 9
+      "popularity_rank": 9,
+      "model": "flux-pro"
     },
     {
       "name": "צבעי מים",
       "prompt_prefix": "watercolor painting of",
-      "popularity_rank": 8
+      "popularity_rank": 8,
+      "model": "flux-pro"
     },
     {
       "name": "קומיקס",
       "prompt_prefix": "comic book style art of",
-      "popularity_rank": 21
+      "popularity_rank": 21,
+      "model": "flux-anime"
     },
     {
       "name": "רטרו",
       "prompt_prefix": "retro style illustration of",
-      "popularity_rank": 22
+      "popularity_rank": 22,
+      "model": "flux"
     }
   ]
 }

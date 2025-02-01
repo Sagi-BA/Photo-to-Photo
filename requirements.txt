@@ -34,6 +34,8 @@ numpy
 # for GOOGLE CLOUD VISION
 deep_translator
 
+# https://console.groq.com/playground?model=llama-3.2-11b-vision-preview
+groq
 
 # aiohttp #This is for telegram
 

@@ -4,6 +4,8 @@ import requests
 from concurrent.futures import ThreadPoolExecutor
 from typing import Union, Literal, List, Tuple
 from dotenv import load_dotenv
+from PIL import Image
+from io import BytesIO
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,6 +22,35 @@ class ImgurUploader:
         self.timeout = timeout
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
 
+    def _convert_webp_to_jpeg(self, image_data: str) -> str:
+        """Convert WebP image to JPEG format"""
+        try:
+            # Decode base64 to bytes
+            image_bytes = base64.b64decode(image_data)
+            
+            # Open image with PIL
+            image = Image.open(BytesIO(image_bytes))
+            
+            # Convert to RGB (removes transparency)
+            if image.mode in ('RGBA', 'LA') or (image.mode == 'P' and 'transparency' in image.info):
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'P':
+                    image = image.convert('RGBA')
+                background.paste(image, mask=image.split()[3])
+                image = background
+            else:
+                image = image.convert('RGB')
+            
+            # Save as JPEG to BytesIO
+            output_buffer = BytesIO()
+            image.save(output_buffer, format='JPEG', quality=95)
+            
+            # Convert back to base64
+            return base64.b64encode(output_buffer.getvalue()).decode()
+        except Exception as e:
+            print(f"Error converting WebP to JPEG: {e}")
+            return image_data
+
     def upload_media_to_imgur(
         self, media_base64: str, media_type: Literal["image", "video"], 
         title: str = "AI Generated Media", 
@@ -27,14 +58,17 @@ class ImgurUploader:
     ) -> str:
         """
         Uploads base64-encoded media (image or video) to Imgur using the API.
-
-        :param media_base64: Base64-encoded string of the image or video.
-        :param media_type: Type of media, either "image" or "video".
-        :param title: Title for the media.
-        :param description: Description for the media.
-        :return: URL of the uploaded media, or a placeholder if upload fails.
         """
-        
+        if media_type == "image":
+            # Try to detect if it's a WebP image
+            try:
+                image_bytes = base64.b64decode(media_base64)
+                img = Image.open(BytesIO(image_bytes))
+                if img.format == 'WEBP':
+                    media_base64 = self._convert_webp_to_jpeg(media_base64)
+            except Exception as e:
+                print(f"Error checking image format: {e}")
+
         payload = {
             'type': 'base64',
             'title': title,
@@ -46,24 +80,25 @@ class ImgurUploader:
         return self._execute_with_retry("https://api.imgur.com/3/upload", payload)
 
     def _execute_with_retry(self, url: str, payload: dict) -> str:
-        # print(payload)
         for attempt in range(self.max_retries):
             try:
                 response = self.session.post(url, data=payload, timeout=self.timeout)
                 response.raise_for_status()
-                return response.json().get('data', {}).get('link', "https://i.ibb.co/wWFYPtQ/no-image.png")
+                result = response.json()
+                if result.get('success', False):
+                    return result.get('data', {}).get('link', "https://i.ibb.co/wWFYPtQ/no-image.png")
+                else:
+                    print(f"Upload failed: {result.get('data', {}).get('error', 'Unknown error')}")
             except requests.exceptions.RequestException as e:
-                if attempt == self.max_retries - 1:
-                    print(f"Upload failed after {self.max_retries} attempts.")
-                    return "https://i.ibb.co/wWFYPtQ/no-image.png"
-                print(f"Attempt {attempt + 1} failed. Retrying...")
+                print(f"Attempt {attempt + 1} failed: {str(e)}")
+            if attempt == self.max_retries - 1:
+                print(f"Upload failed after {self.max_retries} attempts.")
+                return "https://i.ibb.co/wWFYPtQ/no-image.png"
+            print(f"Retrying... ({attempt + 2}/{self.max_retries})")
 
     def upload_multiple(self, media_list: List[Tuple[str, Literal["image", "video"], str, str]]) -> List[str]:
         """
         Uploads multiple media items to Imgur concurrently.
-
-        :param media_list: List of tuples (media_base64, media_type, title, description)
-        :return: List of URLs of the uploaded media
         """
         futures = [
             self.executor.submit(self.upload_media_to_imgur, media, media_type, title, description)
@@ -85,20 +120,3 @@ if __name__ == "__main__":
     
     image_url = uploader.upload_media_to_imgur(image_base64, "image", "Test Image", "This is a test image")
     print(f"Uploaded image URL: {image_url}")
-    
-    # Example with a base64-encoded video
-    with open("uploads/example_video.mp4", "rb") as video_file:
-        video_base64 = base64.b64encode(video_file.read()).decode()
-    
-    video_url = uploader.upload_media_to_imgur(video_base64, "video", "Test Video", "This is a test video")
-    print(f"Uploaded video URL: {video_url}")
-    
-    # Example with multiple uploads
-    # media_list = [
-    #     (image_base64, "image", "Image 1", "Description 1"),
-    #     (video_base64, "video", "Video 1", "Description 2"),
-    #     # Add more tuples as needed
-    # ]
-    # urls = uploader.upload_multiple(media_list)
-    # for i, url in enumerate(urls, 1):
-    #     print(f"Uploaded media {i} URL: {url}")

@@ -57,8 +57,8 @@ async def main_async():
         return
     
     # Display selected image
-    body = "יצרתי לכם תמונה חדשה מה אתם אומרים"
-    st.toast(body, icon='🎉')
+    # body = "יצרתי לכם תמונה חדשה מה אתם אומרים"
+    # st.toast(body, icon='🎉')
 
     st.subheader("הקסם הושלם – הנה היצירה שלכם! 🎉")
     st.image(st.session_state.generated_image, use_container_width=True)

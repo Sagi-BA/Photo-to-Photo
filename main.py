@@ -297,9 +297,29 @@ def hide_streamlit_header_footer():
 for key in ['generated_image', 'selected_image', 'image_description']:
     st.session_state.setdefault(key, None if key != 'image_description' else "")
 
+
+def footer_content():
+    hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            footer:after {
+                content:'goodbye'; 
+                visibility: visible;
+                display: block;
+                position: relative;
+                padding: 5px;
+                top: 2px;
+            }
+            header {visibility: hidden;}
+            #root > div:nth-child(1) > div > div > div > div > section > div {padding-top: 0rem;}
+            </style>
+            """
+    st.markdown(hide_st_style, unsafe_allow_html=True)
+
 async def main():
     with st.spinner('האפליקציה נטענת...'):
-        footer_content = initialize()
+        title, image_path, footer_content = initialize()
         # st.title("🎨 מחולל התמונות החכם")
         hide_streamlit_header_footer()
         styles = load_styles()
@@ -353,7 +373,7 @@ async def main():
         # st.subheader("✨ הגדרות עיבוד")
         with st.spinner('אני קורא את תוכן התמונה...'):
             prompt = st.text_area("תיאור התמונה", translate(st.session_state.image_description, 'iw'), height=100)
-        style = st.selectbox("נא בחרו את סגנון התמונה החדשה שאתם רוצים שאייצר לכם...", [s['name'] for s in styles], index=0)
+        style = st.selectbox("בחרו את סגנון התמונה החדשה שאתם רוצים שאייצר לכם...", [s['name'] for s in styles], index=0)
         
         if st.button("✨ לחצו עליי ותגלו את הקסם ✨", type="primary") and prompt:                
             # Get the selected style data

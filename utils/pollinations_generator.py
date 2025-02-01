@@ -43,7 +43,7 @@ class PollinationsGenerator:
             print(f"Requesting pollinations_url from: {url}")
             # Make the request to Pollinations API with retry logic
             max_retries = 3
-            retry_delay = 2  # seconds
+            retry_delay = 4  # seconds
             
             for attempt in range(max_retries):
                 try:

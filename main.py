@@ -3,6 +3,7 @@ import base64
 import streamlit as st
 import json
 import os
+from streamlit_modal import Modal
 from PIL import Image
 from io import BytesIO
 from utils.counter import increment_user_count, get_user_count
@@ -14,7 +15,7 @@ from utils.greenapi import WhatsAppSender
 from utils.TelegramSender import TelegramSender
 # from utils.Hugging_Face_Transformer import ImageCaptioning
 from deep_translator import GoogleTranslator
-from datetime import datetime
+from datetime import datetime, time
 import pytz
 
 # Cache heavy models and resources
@@ -279,7 +280,7 @@ async def main():
                 sample_images = load_sample_images()
             for img in sample_images:
                 st.image(img, width=200)
-                if st.button("ביחרו תמונה", key=img):
+                if st.button("בחרו תמונה", key=img):
                     img_bytes = decode_base64_to_bytes(img)
                     st.session_state.selected_image, st.session_state.image_description = process_image(img_bytes)
                     if st.session_state.selected_image is None:
@@ -324,18 +325,20 @@ async def main():
         
         st.subheader("🖼️ יצרתם תמונה מהממת! עכשיו הזמן לשתף אותה עם האהובים עליכם 💌")
     
-        phone = st.text_input("מספר טלפון לשליחה בוואטסאפ", placeholder="הכנס מספר טלפון (לדוגמה: 0501234567)")
+        phone = st.text_input("מספר טלפון לשליחה בוואטסאפ", placeholder="למי לשלוח את היצירה? ( טלפון לדוגמה: 0501234567)")
         
-        if st.button("📲 שלח בוואטסאפ"):
+        if st.button("לשתף בוואטסאפ 📲"):
             if phone and phone.isdigit() and len(phone) >= 9:
                 try:
-                    with st.spinner('שולח את התמונה בוואטסאפ...'):
+                    with st.spinner("אני שולח את התמונה לוואטסאפ..."):
                         img_data = base64.b64decode(st.session_state.generated_image.split(',')[1])
                         whatsapp = load_whatsapp_sender()
                         success = whatsapp.send_image_from_bytesio(
                             phone=phone,
                             image_bytesio=BytesIO(img_data),
-                            caption="תמונה שנוצרה באמצעות מחולל התמונות החכם"
+                            caption= """✨ יצירת אמנות ייחודית שנוצרה במיוחד עבורכם באמצעות מחולל התמונות החכם של שגיא בר-און! 🌟
+                            התנסו בעצמכם בכתובת: https://sagi-photo-to-photo.streamlit.app/
+                            אהבתם? שתפו את החוויה עם חברים ומשפחה – זה לגמרי בחינם! 🎉"""
                         )
                         
                         if success:

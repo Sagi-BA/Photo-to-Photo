@@ -40,6 +40,9 @@ deep_translator
 # https://console.groq.com/playground?model=llama-3.2-11b-vision-preview
 groq
 
+# https://pollinations.ai/
+pollinations
+
 # aiohttp #This is for telegram
 
 

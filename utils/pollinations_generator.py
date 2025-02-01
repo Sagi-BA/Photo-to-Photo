@@ -37,9 +37,10 @@ class PollinationsGenerator:
                 'enhance': 'true'
             }
             
+            
             # Build the complete URL
             url = self.pollinations_url.format(prompt=encoded_prompt)
-            
+            print(f"Requesting pollinations_url from: {url}")
             # Make the request to Pollinations API with retry logic
             max_retries = 3
             retry_delay = 2  # seconds

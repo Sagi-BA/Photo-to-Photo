@@ -33,11 +33,7 @@ class PollinationsGenerator:
             # Encode the prompt for URL
             encoded_prompt = quote(self.clean_text(prompt))
             
-            # Set up the headers and parameters
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            
+            # Set up the parameters
             params = {
                 'model': model_name,
                 'width': 1280,
@@ -46,7 +42,6 @@ class PollinationsGenerator:
                 'nologo': 'true',
                 'enhance': 'true'
             }
-            
             
             # Build the complete URL
             url = self.pollinations_url.format(prompt=encoded_prompt)
@@ -58,30 +53,13 @@ class PollinationsGenerator:
             
             for attempt in range(max_retries):
                 try:
-                    response = requests.get(
-                        url, 
-                        headers=headers,
-                        params=params,
-                        timeout=30,  # 30 seconds timeout
-                        stream=True   # Stream the response
-                    )
+                    # Simple GET request without any headers
+                    response = requests.get(url, params=params, timeout=30)
                     
-                    # response.raise_for_status()
-                    
-                    # Read the content
-                    image_data = response.content
-                    
-                    
-                    # Verify it's an image by trying to open it
-                    # img = Image.open(io.BytesIO(image_data))
-                    
-                    
-                    # Convert to base64
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    
-                    
-                    # Return as data URI
-                    return f"data:image/jpeg;base64,{image_base64}"
+                    # If we got an image, encode and return it
+                    if response.content:
+                        image_base64 = base64.b64encode(response.content).decode('utf-8')
+                        return f"data:image/jpeg;base64,{image_base64}"
                     
                 except requests.exceptions.RequestException as e:
                     if attempt < max_retries - 1:
@@ -100,37 +78,17 @@ def test():
     """Test the image generation"""
     generator = PollinationsGenerator()
     
-    # Test cases
-    test_cases = [
-        {
-            "prompt": "A beautiful sunset over the ocean, photorealistic",
-            "model": "turbo",
-            "output": "sunset_test.jpg"
-        },
-        {
-            "prompt": "A cute cat playing with yarn, cartoon style",
-            "model": "flux",
-            "output": "cat_test.jpg"
-        }
-    ]
+    test_prompt = "A beautiful sunset over the ocean, photorealistic"
+    result = generator.generate_image(test_prompt, "flux")
     
-    for i, test in enumerate(test_cases, 1):
-        print(f"\nTest {i}: {test['prompt']}")
-        try:
-            # Generate image
-            result = generator.generate_image(test['prompt'], test['model'])
-            
-            if result:
-                # Save the test image
-                img_data = base64.b64decode(result.split(',')[1])
-                with open(test['output'], 'wb') as f:
-                    f.write(img_data)
-                print(f"✓ Success - saved as {test['output']}")
-            else:
-                print("✗ Failed to generate image")
-                
-        except Exception as e:
-            print(f"✗ Error in test {i}: {e}")
+    if result:
+        # Save the test image
+        img_data = base64.b64decode(result.split(',')[1])
+        with open('test_output.jpg', 'wb') as f:
+            f.write(img_data)
+        print("✓ Success - saved as test_output.jpg")
+    else:
+        print("✗ Failed to generate image")
             
 if __name__ == "__main__":
     test()

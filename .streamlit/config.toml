@@ -1,0 +1,8 @@
+[ui]
+hideTopBar = false
+
+[theme]
+base = "light" 
+
+[server]
+maxUploadSize = 5

@@ -5,3 +5,4 @@ uploads
 # Ignore all __pycache__ directories
 **/__pycache__/
 myenv
+.streamlit/config.toml_XXX

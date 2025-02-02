@@ -201,7 +201,8 @@ async def main_async():
                 st.session_state.is_generating = True
                 st.session_state.show_snow = False
                 
-                with st.spinner('✨ אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
+                # with st.spinner('✨ אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
+                with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
                     generator = PollinationsGenerator()
                     model = style.get('model', 'flux')
                     full_prompt = f"{style['prompt_prefix']} {translate(st.session_state.prompt, 'en')}"
@@ -241,7 +242,7 @@ async def main_async():
         if phone and phone.isdigit() and len(phone) >= 9:
             try:
                 # with st.spinner("📱 שולח את התמונה בוואטסאפ..."):
-                with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
+                with st.spinner('אני שולח את ההודעה לוואטסאפ'):
                     img_data = base64.b64decode(st.session_state.generated_image.split(',')[1])
                     whatsapp = load_whatsapp_sender()
                     success = whatsapp.send_image_from_bytesio(

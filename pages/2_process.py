@@ -147,23 +147,11 @@ async def main_async():
         st.session_state.state['selected_style'] = False
         st.session_state.selected_image = None
         st.session_state.generated_image = None
-        st.rerun()
-        
-    # st.markdown("""
-    #     <div class='style-container'>
-    #         <h3 style='color: #1e88e5; text-align: center; margin: 0;'>התמונה שבחרתם 🖼️</h3>
-    #     </div>
-    # """, unsafe_allow_html=True)
+        st.rerun()        
     
     st.image(st.session_state.selected_image, use_container_width=True)
 
     styles = load_styles()
-
-    # st.markdown("""
-    #     <div class='style-container'>
-    #         <h3 style='color: #1e88e5; margin: 0;'>✨ בואו נהפוך את התמונה ליצירת אמנות ✨</h3>
-    #     </div>
-    # """, unsafe_allow_html=True)
 
     with st.spinner('אני קורא את תוכן התמונה...'):
         prompt = st.text_area(
@@ -175,8 +163,7 @@ async def main_async():
 
     st.markdown("""
         <div class='style-container'>
-            <h3 style='color: #1e88e5; text-align: center; margin: 0;'>בחרו סגנון ליצירת התמונה 🎨</h3>
-            <p style='text-align: center; color: #666; margin: 0.5rem 0 0 0;'>כל כפתור יוצר את התמונה בסגנון שונה</p>
+            <h3 style='color: #1e88e5; text-align: center; margin: 0;'>בחרו סגנון ליצירת התמונה</h3>
         </div>
     """, unsafe_allow_html=True)
 

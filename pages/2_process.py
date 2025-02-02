@@ -1,7 +1,11 @@
 # pages/2_✨_process.py
+import asyncio
+import base64
+from io import BytesIO
 import streamlit as st
 from deep_translator import GoogleTranslator
 import json
+from utils.TelegramSender import TelegramSender
 from utils.pollinations_generator import PollinationsGenerator
 from utils.shared_styles import apply_styles
 
@@ -53,7 +57,28 @@ def generate_image_with_style(style, prompt):
             st.error('אירעה שגיאה ביצירת התמונה - נסו שוב.')
             return False
 
-def main():
+
+async def send_telegram_image(image_data: str, caption: str):
+    """Send image to Telegram"""
+    try:
+        if ',' in image_data:
+            image_base64 = image_data.split(',')[1]
+        else:
+            image_base64 = image_data
+        
+        image_bytes = BytesIO(base64.b64decode(image_base64))
+        telegram_sender = TelegramSender()
+        
+        if await telegram_sender.verify_bot_token():
+            await telegram_sender.send_photo_bytes(image_bytes, caption=caption)
+        else:
+            raise Exception("Bot token verification failed")
+    except Exception as e:
+        print(f"Failed to send to Telegram: {str(e)}")
+    finally:
+        await telegram_sender.close_session()
+        
+async def main_async():
     # Apply shared styles including button effects
     apply_styles()
     st.markdown("""
@@ -165,6 +190,13 @@ def main():
                 use_container_width=True
             ):
                 if generate_image_with_style(style, prompt):
+                    # Send to Telegram
+                    telegram_caption = f"New image generated\nPrompt: {st.session_state.prompt}\nStyle: {st.session_state.selected_style}"
+                    try:
+                        new_image=st.session_state.generated_image
+                        await send_telegram_image(new_image, telegram_caption)
+                    except Exception as e:
+                        print(f"Error sending to Telegram: {e}")
                     st.rerun()
 
     # Handle successful generation
@@ -172,6 +204,10 @@ def main():
         st.session_state.state['image_processed'] = True
         st.session_state.state['current_page'] = '3_result'
         st.rerun()
+
+
+def main():
+    asyncio.run(main_async())
 
 if __name__ == "__main__":
     main()

@@ -6,3 +6,4 @@ uploads
 **/__pycache__/
 myenv
 .streamlit/config.toml_XXX
+**/pages - Copy/

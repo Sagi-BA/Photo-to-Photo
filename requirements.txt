@@ -8,8 +8,8 @@
 
 # Web Application
 streamlit 
-streamlit-modal 
-streamlit-extras
+# streamlit-modal 
+# streamlit-extras
 
 # Image Processing
 Pillow
@@ -18,19 +18,19 @@ requests
 # Environment Variables
 python-dotenv
 # Data Processing
-pandas
+# pandas
 # Type Hints
-typing-extensions
+# typing-extensions
 # URL Processing
-urllib3
+# urllib3
 
-together
+# together
 
 # for GOOGLE CLOUD VISION
 # google-cloud-vision
-torch
-torchvision
-transformers
+# torch
+# torchvision
+# transformers
 
 numpy
 

@@ -76,6 +76,81 @@ def load_css():
         .stImage:hover img {
             transform: scale(1.02);
         }
+        /* Button hover and click animations */
+        .stButton > button {
+            transition: all 0.3s ease;
+            transform-origin: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stButton > button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: #4CAF50 !important;
+        }
+        
+        .stButton > button:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        /* Custom sections styling with hover effects */
+        .custom-section {
+            transition: all 0.3s ease;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid transparent;
+        }
+        
+        .custom-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .style-section {
+            background-color: #f0f8ff;
+        }
+        
+        .style-section:hover {
+            border-color: #1e88e5;
+        }
+        
+        .whatsapp-section {
+            background-color: #e8f5e9;
+        }
+        
+        .whatsapp-section:hover {
+            border-color: #2e7d32;
+        }
+        
+        /* Selectbox hover effect */
+        .stSelectbox:hover {
+            border-color: #1e88e5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Input field hover effect */
+        .stTextInput:hover {
+            border-color: #2e7d32;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Title animation */
+        .title-animation {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
     """
 

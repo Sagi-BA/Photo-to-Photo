@@ -58,18 +58,7 @@ def main():
 
         # Load and display the custom expander HTML
         expander_html = load_html_file('expander.html')
-        st.markdown(expander_html, unsafe_allow_html=True)    
-
-        # Optional: Add button to start over
-        if st.button("יצירה חדשה 🔄"):
-            st.session_state.state['current_page'] = '1_upload'
-            st.session_state.state['image_uploaded'] = False
-            st.session_state.state['image_processed'] = False
-            st.session_state.state['prompt'] = False
-            st.session_state.state['selected_style'] = False
-            st.session_state.selected_image = None
-            st.session_state.generated_image = None
-            st.rerun()
+        st.markdown(expander_html, unsafe_allow_html=True)            
 
         #### Import and run the pages ###
         try:

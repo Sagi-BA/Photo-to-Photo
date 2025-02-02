@@ -10,6 +10,16 @@ class PollinationsGenerator:
     def __init__(self):
         self.pollinations_url = "https://image.pollinations.ai/prompt/{prompt}"
 
+    def clean_text(self, text):
+        """Clean text from HTML tags and normalize line breaks"""
+        if not text:
+            return ""
+        # Replace HTML line breaks with spaces
+        text = text.replace('<br>', ' ').replace('<br/>', ' ').replace('<br />', ' ')
+        # Replace multiple spaces with single space
+        text = ' '.join(text.split())
+        return text
+
     def generate_image(self, prompt, model_name="flux"):
         """
         Generate image and return as data URI
@@ -21,7 +31,7 @@ class PollinationsGenerator:
         """
         try:
             # Encode the prompt for URL
-            encoded_prompt = quote(prompt)
+            encoded_prompt = quote(self.clean_text(prompt))
             
             # Set up the headers and parameters
             headers = {
@@ -32,7 +42,7 @@ class PollinationsGenerator:
                 'model': model_name,
                 'width': 1280,
                 'height': 720,
-                'seed': 42,
+                'seed': 10,
                 'nologo': 'true',
                 'enhance': 'true'
             }
@@ -40,10 +50,11 @@ class PollinationsGenerator:
             
             # Build the complete URL
             url = self.pollinations_url.format(prompt=encoded_prompt)
+            
             print(f"Requesting pollinations_url from: {url}")
             # Make the request to Pollinations API with retry logic
-            max_retries = 3
-            retry_delay = 4  # seconds
+            max_retries = 4
+            retry_delay = 5  # seconds
             
             for attempt in range(max_retries):
                 try:
@@ -54,16 +65,20 @@ class PollinationsGenerator:
                         timeout=30,  # 30 seconds timeout
                         stream=True   # Stream the response
                     )
-                    response.raise_for_status()
+                    
+                    # response.raise_for_status()
                     
                     # Read the content
                     image_data = response.content
                     
+                    
                     # Verify it's an image by trying to open it
-                    img = Image.open(io.BytesIO(image_data))
+                    # img = Image.open(io.BytesIO(image_data))
+                    
                     
                     # Convert to base64
                     image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    
                     
                     # Return as data URI
                     return f"data:image/jpeg;base64,{image_base64}"

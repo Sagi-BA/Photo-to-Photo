@@ -202,7 +202,7 @@ async def main_async():
                 st.session_state.show_snow = False
                 
                 # with st.spinner('✨ אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
-                with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
+                with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)... המתינו עד שתראו ❄️❄️❄️'):
                     generator = PollinationsGenerator()
                     model = style.get('model', 'flux')
                     full_prompt = f"{style['prompt_prefix']} {translate(st.session_state.prompt, 'en')}"

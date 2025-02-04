@@ -44,7 +44,7 @@ def generate_image_with_style(style, prompt):
     st.session_state.prompt = prompt
     st.session_state.selected_style = style['name']
     
-    with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
+    with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)... המתינו עד שתראו ❄️❄️❄️'):
     # with st.spinner('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
         generator = PollinationsGenerator()
         model = style.get('model', 'flux')

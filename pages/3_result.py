@@ -95,7 +95,7 @@ def whatsapp_section():
     return phone, share
 
 async def main_async():
-    apply_styles()
+    # apply_styles()
     st.markdown("""
         <style>
             /* Remove extra margins and padding */
@@ -238,7 +238,7 @@ async def main_async():
     )
     
     st.markdown('<div class="whatsapp-section">', unsafe_allow_html=True)
-    if st.button("📲 שלח בוואטסאפ 📲", type="primary", use_container_width=True):
+    if st.button("📲 שלחו בוואטסאפ 📲", type="primary", use_container_width=True):
         if phone and phone.isdigit() and len(phone) >= 9:
             try:
                 # with st.spinner("📱 שולח את התמונה בוואטסאפ..."):

@@ -1,6 +1,6 @@
 # main.py [the template page]
-import importlib
 import streamlit as st
+import importlib
 import os
 from datetime import datetime
 import pytz
@@ -49,7 +49,7 @@ def load_html_file(file_name):
     
 def main():
     # Apply shared styles
-    apply_styles()
+    # apply_styles()
     
     with st.spinner('האפליקציה נטענת...'):
         title, image_path, footer_content = initialize()
@@ -75,6 +75,7 @@ def main():
 
     # Display user count
     user_count = get_user_count(formatted=True)
+    print(user_count)
     st.markdown(f"<p class='user-count' style='color: #4B0082;'>סה\"כ משתמשים: {user_count}</p>", unsafe_allow_html=True)
 
     # Display and update last datetime use

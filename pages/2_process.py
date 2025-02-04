@@ -80,7 +80,7 @@ async def send_telegram_image(image_data: str, caption: str):
         
 async def main_async():
     # Apply shared styles including button effects
-    apply_styles()
+    # apply_styles()
     st.markdown("""
         <style>
             /* Remove extra margins and padding */

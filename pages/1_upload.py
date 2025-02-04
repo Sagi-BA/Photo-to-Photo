@@ -109,7 +109,7 @@ def process_and_navigate(image_data, is_sample=False):
 
 def main():
     # Apply shared styles
-    apply_styles()
+    # apply_styles()
     
     st.subheader("העלאת תמונה 📸")
     

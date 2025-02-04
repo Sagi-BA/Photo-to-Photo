@@ -51,6 +51,7 @@ def load_css():
             width: 100%;
             margin-top: 0.5rem;
             margin-bottom: 1.5rem;
+            color: white !important;  /* Changed caption buttons to white */
         }
 
         /* Modern Image Container Styling */
@@ -76,6 +77,53 @@ def load_css():
         .stImage:hover img {
             transform: scale(1.02);
         }
+
+        /* New WhatsApp button styling */
+        .whatsapp-section button {
+            background: linear-gradient(45deg, #25d366, #128C7E) !important;
+            color: white !important;
+            border: none !important;
+            font-weight: bold !important;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease !important;
+            animation: whatsapp-pulse 2s infinite;
+        }
+
+        .whatsapp-section button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes whatsapp-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .whatsapp-section button:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3) !important;
+        }
+        
         /* Button hover and click animations */
         .stButton > button {
             transition: all 0.3s ease;

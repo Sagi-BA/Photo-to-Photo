@@ -94,6 +94,94 @@ def whatsapp_section():
     share = st.button("📲 שלח בוואטסאפ 📲", type="primary", use_container_width=True)
     return phone, share
 
+# Add this function before main_async in 3_result.py
+
+def generate_image_with_style(style, prompt):
+    """Generate image with selected style"""
+    import time
+    
+    if not prompt:
+        st.warning("נא להוסיף תיאור לתמונה")
+        return False
+        
+    full_prompt = f"{style['prompt_prefix']} {translate(st.session_state.prompt, 'en')}"
+    
+    # Create a centered loading message with custom styling
+    loading_placeholder = st.empty()
+    loading_placeholder.markdown("""
+        <div style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(25, 118, 210, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-align: center;
+            min-width: 300px;
+            animation: pulse 2s infinite;
+        ">
+            <h2 style="
+                color: #ffffff;
+                margin: 0;
+                font-size: 24px;
+                margin-bottom: 15px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            ">✨ יוצר קסם עבורכם ✨</h2>
+            <p style="
+                color: #ffffff;
+                margin: 0;
+                font-size: 18px;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            ">❄️ אנא המתינו עד שתראו ❄️</p>
+            <div style="
+                margin-top: 20px;
+                font-size: 30px;
+                animation: bounce 1s infinite;
+            ">🎨</div>
+        </div>
+        <style>
+            @keyframes pulse {
+                0% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-50%, -50%) scale(1.05); }
+                100% { transform: translate(-50%, -50%) scale(1); }
+            }
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    try:
+        # Instead of generating image, just wait 4 seconds
+        time.sleep(4)
+        
+        # # For testing, just set a dummy image or reuse the selected image
+        # st.session_state.generated_image = st.session_state.selected_image  # Reuse uploaded image
+        # st.session_state.selected_style = style['name']
+        
+        # loading_placeholder.empty()  # Clear the loading message
+        # return True
+    
+        generator = PollinationsGenerator()
+        model = style.get('model', 'flux')
+        full_prompt = f"{style['prompt_prefix']} {translate(st.session_state.prompt, 'en')}"
+        
+        new_image = generator.generate_image(full_prompt, model)
+        if new_image:
+            st.session_state.generated_image = new_image
+            st.session_state.selected_style = style['name']
+            st.session_state.is_generating = False
+            st.session_state.show_snow = True  # Enable snow for next display
+            
+    except Exception as e:
+        loading_placeholder.empty()  # Clear the loading message
+        st.error(f'אירעה שגיאה: {str(e)}')
+        return False
+    
 async def main_async():
     # apply_styles()
     st.markdown("""
@@ -201,29 +289,20 @@ async def main_async():
                 st.session_state.is_generating = True
                 st.session_state.show_snow = False
                 
-                # with st.spinner('✨ אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
-                with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)... המתינו עד שתראו ❄️❄️❄️'):
-                    generator = PollinationsGenerator()
-                    model = style.get('model', 'flux')
-                    full_prompt = f"{style['prompt_prefix']} {translate(st.session_state.prompt, 'en')}"
+                if generate_image_with_style(style, st.session_state.prompt):
+                    # Send to Telegram
+                    telegram_caption = f"New image generated\nPrompt: {st.session_state.prompt}\nStyle: {st.session_state.selected_style}"
+                    try:
+                        await send_telegram_image(st.session_state.generated_image, telegram_caption)
+                    except Exception as e:
+                        print(f"Error sending to Telegram: {e}")
                     
-                    new_image = generator.generate_image(full_prompt, model)
-                    if new_image:
-                        st.session_state.generated_image = new_image
-                        st.session_state.selected_style = style['name']
-                        st.session_state.is_generating = False
-                        st.session_state.show_snow = True  # Enable snow for next display
-                        
-                        # Send to Telegram
-                        telegram_caption = f"New image generated\nPrompt: {st.session_state.prompt}\nStyle: {st.session_state.selected_style}"
-                        try:
-                            await send_telegram_image(new_image, telegram_caption)
-                        except Exception as e:
-                            print(f"Error sending to Telegram: {e}")
-                        st.rerun()
-                    else:
-                        st.session_state.is_generating = False
-                        st.error('אירעה שגיאה ביצירת התמונה - נסו שוב.')
+                    st.session_state.is_generating = False
+                    st.session_state.show_snow = True
+                    st.rerun()
+                else:
+                    st.session_state.is_generating = False
+                    st.error('אירעה שגיאה ביצירת התמונה - נסו שוב.')
 
     # WhatsApp sharing section
     # st.markdown("""

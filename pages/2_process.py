@@ -95,7 +95,7 @@ def generate_image_with_style(style, prompt):
     """, unsafe_allow_html=True)
     
     try:
-         # Instead of generating image, just wait 4 seconds
+        # Instead of generating image, just wait 4 seconds
         # time.sleep(4)
         
         # # For testing, just set a dummy image or reuse the uploaded image

@@ -8,7 +8,7 @@ from utils.counter import increment_user_count, get_user_count
 from utils.init import initialize
 from utils.shared_styles import apply_styles
 
-# Clear all cache
+# # Clear all cache
 # st.cache_data.clear()
 # st.cache_resource.clear()
 
@@ -82,7 +82,7 @@ def main():
 
     # Display user count
     user_count = get_user_count(formatted=True)
-    print(user_count)
+    # print(user_count)
     st.markdown(f"<p class='user-count' style='color: #4B0082;'>סה\"כ משתמשים: {user_count}</p>", unsafe_allow_html=True)
 
     # Display and update last datetime use

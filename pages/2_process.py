@@ -2,7 +2,6 @@
 import asyncio
 import base64
 from io import BytesIO
-import time
 import streamlit as st
 from deep_translator import GoogleTranslator
 import json
@@ -45,82 +44,19 @@ def generate_image_with_style(style, prompt):
     st.session_state.prompt = prompt
     st.session_state.selected_style = style['name']
     
-    # Create a centered loading message with custom styling
-    loading_placeholder = st.empty()
-    loading_placeholder.markdown("""
-        <div style="
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(25, 118, 210, 0.95);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
-            text-align: center;
-            min-width: 300px;
-            animation: pulse 2s infinite;
-        ">
-            <h2 style="
-                color: #ffffff;
-                margin: 0;
-                font-size: 24px;
-                margin-bottom: 15px;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            ">✨ יוצר קסם עבורכם ✨</h2>
-            <p style="
-                color: #ffffff;
-                margin: 0;
-                font-size: 18px;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            ">❄️ אנא המתינו עד שתראו ❄️</p>
-            <div style="
-                margin-top: 20px;
-                font-size: 30px;
-                animation: bounce 1s infinite;
-            ">🎨</div>
-        </div>
-        <style>
-            @keyframes pulse {
-                0% { transform: translate(-50%, -50%) scale(1); }
-                50% { transform: translate(-50%, -50%) scale(1.05); }
-                100% { transform: translate(-50%, -50%) scale(1); }
-            }
-            @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-            }
-        </style>
-    """, unsafe_allow_html=True)
-    
-    try:
-         # Instead of generating image, just wait 4 seconds
-        # time.sleep(4)
-        
-        # # For testing, just set a dummy image or reuse the uploaded image
-        # st.session_state.generated_image = st.session_state.selected_image  # Reuse uploaded image
-        
-        # loading_placeholder.empty()  # Clear the loading message
-        # st.session_state.state['image_processed'] = True
-        # return True
-    
+    with st.toast('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)... המתינו עד שתראו ❄️❄️❄️'):
+    # with st.spinner('אני יוצר את הקסם... (זה יכול לקחת עד 30 שניות)'):
         generator = PollinationsGenerator()
         model = style.get('model', 'flux')
         
         st.session_state.generated_image = generator.generate_image(full_prompt, model)
         if st.session_state.generated_image:
-            loading_placeholder.empty()  # Clear the loading message
             st.session_state.state['image_processed'] = True
             return True
         else:
-            loading_placeholder.empty()  # Clear the loading message
             st.error('אירעה שגיאה ביצירת התמונה - נסו שוב.')
             return False
-    except Exception as e:
-        loading_placeholder.empty()  # Clear the loading message
-        st.error(f'אירעה שגיאה: {str(e)}')
-        return False
+
 
 async def send_telegram_image(image_data: str, caption: str):
     """Send image to Telegram"""

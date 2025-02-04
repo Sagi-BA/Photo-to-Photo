@@ -126,13 +126,54 @@ div.row-widget.stRadio > div label:hover {
 /* File Uploader */
 .stFileUploader {
   padding: 2rem;
-  border: 2px dashed #dee2e6;
+  border: 2px dashed #023d79;
   border-radius: 10px;
   text-align: center;
 }
 
+.stFileUploader {
+    padding: 2rem;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    text-align: center;
+    direction: rtl;  /* Add RTL support */
+}
+
+/* Make the uploader area more visible */
+.stFileUploader > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 4px;
+    padding: 20px;
+    cursor: pointer;
+}
+
+/* Style for the button text */
+.stFileUploader > div button {
+    font-family: "Heebo", sans-serif !important;  /* Hebrew font */
+    color: black !important;
+    direction: rtl !important;
+}
+
+/* File type text styling */
+.stFileUploader p {
+    font-family: "Heebo", sans-serif !important;
+    color: #666666 !important;
+    font-size: 0.9em !important;
+    margin-top: 8px;
+    direction: rtl !important;
+}
+
+/* Hover effect */
+.stFileUploader > div:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
 /* Buttons */
-button, 
+
 button span, 
 button p,
 button div,

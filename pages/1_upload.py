@@ -122,7 +122,12 @@ def main():
     )
     
     if image_source == "העלאת תמונה":
-        uploaded_file = st.file_uploader("גררו לכאן תמונה או לחצו לבחירה", type=["jpg", "jpeg", "png", "gif", "webp"])
+        uploaded_file = st.file_uploader(
+            "גררו לכאן תמונה או לחצו לבחירה",  # Hebrew text for "Drag and drop file here or click"
+            type=["jpg", "jpeg", "png", "gif", "webp"],
+            label_visibility='collapsed',  # This hides the label above
+            help="JPG, JPEG, PNG, GIF, WEBP קבצים עד 5MB מסוג"  # Hebrew text for file types
+        )
         if uploaded_file:
             process_and_navigate(uploaded_file)
     

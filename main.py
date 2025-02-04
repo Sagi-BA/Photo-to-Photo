@@ -8,6 +8,13 @@ from utils.counter import increment_user_count, get_user_count
 from utils.init import initialize
 from utils.shared_styles import apply_styles
 
+# Clear all cache
+# st.cache_data.clear()
+# st.cache_resource.clear()
+
+# # Clear session state
+# for key in list(st.session_state.keys()):
+#     del st.session_state[key]
 
 # Set page config for better mobile responsiveness
 st.set_page_config(
@@ -95,4 +102,6 @@ if __name__ == "__main__":
         st.session_state.counted = True
         increment_user_count()
     
+   
+        
     main()

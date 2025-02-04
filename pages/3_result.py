@@ -316,7 +316,7 @@ async def main_async():
         placeholder="למי לשלוח את היצירה? (טלפון לדוגמה: 0501234567)"
     )
     
-    st.markdown('<div class="whatsapp-section">', unsafe_allow_html=True)
+    st.markdown('<div class="whatsapp-section">', unsafe_allow_html=True) 
     if st.button("📲 שלחו בוואטסאפ 📲", type="primary", use_container_width=True):
         if phone and phone.isdigit() and len(phone) >= 9:
             try:

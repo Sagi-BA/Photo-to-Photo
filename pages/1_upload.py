@@ -142,7 +142,7 @@ def main():
             cols = st.columns(2)
             for idx, img in enumerate(sample_images):
                 with cols[idx % 2]:
-                    st.image(img, use_container_width=True)
+                    st.image(img)
                     if st.button("בחרו תמונה זו", key=f"sample_{idx}"):
                         process_and_navigate(img, is_sample=True)
 

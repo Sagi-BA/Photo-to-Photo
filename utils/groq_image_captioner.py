@@ -16,7 +16,7 @@ class GroqImageCaptioner:
             raise ValueError("Groq API key not found. Please provide it or set GROQ_API_KEY environment variable.")
         
         # Load model parameters from .env with defaults
-        self.model = os.getenv("GROQ_MODEL", "llama-3.2-11b-vision-preview")
+        self.model = os.getenv("GROQ_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
         self.temperature = float(os.getenv("GROQ_TEMPERATURE", "0.7"))
         self.max_tokens = int(os.getenv("GROQ_MAX_TOKENS", "1024"))
         
@@ -64,7 +64,7 @@ class GroqImageCaptioner:
                     }
                 ],
                 temperature=self.temperature,
-                max_completion_tokens=self.max_tokens,
+                max_tokens=self.max_tokens,
                 top_p=1,
                 stream=False
             )
@@ -104,7 +104,7 @@ class GroqImageCaptioner:
                     }
                 ],
                 temperature=self.temperature,
-                max_completion_tokens=self.max_tokens,
+                max_tokens=self.max_tokens,
                 top_p=1,
                 stream=False
             )

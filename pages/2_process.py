@@ -1,4 +1,3 @@
-
 # pages/2_✨_process.py sagi
 import asyncio
 import base64
@@ -150,7 +149,7 @@ async def main_async():
         st.session_state.generated_image = None
         st.rerun()        
     
-    st.image(st.session_state.selected_image, use_container_width=True)
+    st.image(st.session_state.selected_image)
 
     styles = load_styles()
 

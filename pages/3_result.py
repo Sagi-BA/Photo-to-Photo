@@ -9,6 +9,7 @@ from utils.TelegramSender import TelegramSender
 from utils.pollinations_generator import PollinationsGenerator
 from deep_translator import GoogleTranslator
 from utils.shared_styles import apply_styles
+import re
 
 @st.cache_data
 def load_styles():
@@ -75,7 +76,7 @@ def style_section():
         index=0
     )
     
-    regenerate = st.button("✨ צרו תמונה בסגנון חדש ✨", type="primary", use_container_width=True)
+    regenerate = st.button("✨ צרו תמונה בסגנון חדש ✨", type="primary")
     return new_style, regenerate, styles
 
 def whatsapp_section():
@@ -91,7 +92,7 @@ def whatsapp_section():
         placeholder="למי לשלוח את היצירה? (טלפון לדוגמה: 0501234567)"
     )
     
-    share = st.button("📲 שלח בוואטסאפ 📲", type="primary", use_container_width=True)
+    share = st.button("📲 שלח בוואטסאפ 📲", type="primary")
     return phone, share
 
 async def main_async():
@@ -172,7 +173,18 @@ async def main_async():
     </div>
     """, unsafe_allow_html=True)
     
-    st.image(st.session_state.generated_image, use_container_width=True)
+    if st.session_state.get("generated_image") and st.session_state.generated_image not in [None, ""]:
+        def display_base64_image(data_uri):
+            match = re.match(r"data:image/[^;]+;base64,(.*)", data_uri)
+            if match:
+                img_bytes = base64.b64decode(match.group(1))
+                st.image(BytesIO(img_bytes))
+            else:
+                st.image(data_uri)
+
+        display_base64_image(st.session_state.generated_image)
+    else:
+        st.warning("לא נמצאה תמונה להצגה (No image found to display)")
     
     # Only show snow if we're not generating and it's allowed
     if not st.session_state.is_generating and st.session_state.show_snow:
@@ -196,7 +208,6 @@ async def main_async():
             if st.button(
                 f"{style['name']}",
                 key=f"style_{idx}",
-                use_container_width=True
             ):
                 st.session_state.is_generating = True
                 st.session_state.show_snow = False
@@ -238,7 +249,7 @@ async def main_async():
     )
     
     st.markdown('<div class="whatsapp-section">', unsafe_allow_html=True)
-    if st.button("📲 שלחו בוואטסאפ 📲", type="primary", use_container_width=True):
+    if st.button("📲 שלחו בוואטסאפ 📲", type="primary"):
         if phone and phone.isdigit() and len(phone) >= 9:
             try:
                 # with st.spinner("📱 שולח את התמונה בוואטסאפ..."):

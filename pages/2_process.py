@@ -8,6 +8,7 @@ import json
 from utils.TelegramSender import TelegramSender
 from utils.pollinations_generator import PollinationsGenerator
 from utils.shared_styles import apply_styles
+import re
 
 @st.cache_data
 def load_styles():
@@ -173,8 +174,7 @@ async def main_async():
         with cols[idx % 2]:
             if st.button(
                 f"{style['name']}",
-                key=f"style_{idx}",
-                use_container_width=True
+                key=f"style_{idx}"
             ):
                 if generate_image_with_style(style, prompt):
                     # Send to Telegram
@@ -192,6 +192,16 @@ async def main_async():
         st.session_state.state['current_page'] = '3_result'
         st.rerun()
 
+    def display_base64_image(data_uri):
+        # Extract base64 part from data URI
+        match = re.match(r"data:image/[^;]+;base64,(.*)", data_uri)
+        if match:
+            img_bytes = base64.b64decode(match.group(1))
+            st.image(BytesIO(img_bytes))
+        else:
+            st.image(data_uri)  # fallback for other formats
+
+    display_base64_image(st.session_state.generated_image)
 
 def main():
     asyncio.run(main_async())

@@ -25,6 +25,12 @@
       "model": "flux-realism"
     },
     {
+      "name": "ג'יבלי",
+      "prompt_prefix": "Ghibli studio style of",
+      "popularity_rank": 23,
+      "model": "flux-realism"
+    },
+    {
       "name": "דיגיטל ארט",
       "prompt_prefix": "digital art of",
       "popularity_rank": 5,
